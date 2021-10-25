@@ -20,7 +20,7 @@ class GraphicsProgram3D:
         pygame.display.set_mode((800,600), pygame.OPENGL|pygame.DOUBLEBUF)
 
         # hide mouse and grab input
-        pygame.mouse.set_visible(True)
+        pygame.mouse.set_visible(False)
         pygame.event.set_grab(True)
 
         self.view_matrix = ViewMatrix()

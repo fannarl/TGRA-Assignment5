@@ -15,7 +15,7 @@ class Vertex:
     TangentOffset = ctypes.c_void_p(TexCoordsOffset.value + glm.sizeof(glm.vec2))
     BitangentOffset = ctypes.c_void_p(TangentOffset.value + glm.sizeof(glm.vec3))
     size = BitangentOffset.value + glm.sizeof(glm.vec3)
-
+    
 class Texture:
     def __init__(self, id : int, type : str, path : str):
         self.id = id
@@ -73,7 +73,8 @@ class Mesh:
 
         # always good practice to set everything back to defaults once configured.
         glActiveTexture(GL_TEXTURE0)
-        
+
+
     # initializes all the buffer objects/arrays
     def setupMesh(self):
 
@@ -111,3 +112,4 @@ class Mesh:
         glVertexAttribPointer(4, 3, GL_FLOAT, GL_FALSE, Vertex.size, Vertex.BitangentOffset)
 
         glBindVertexArray(0)
+

@@ -13,6 +13,7 @@ import platform, ctypes, os
 
 from typing import List
 
+# function that loads and automatically flips an image vertically
 LOAD_IMAGE = lambda name: Image.open(name).transpose(Image.FLIP_TOP_BOTTOM)
 
 class Model:
@@ -170,3 +171,4 @@ def TextureFromFile(path : str, directory : str, gamma : bool = False) -> int:
         print("Texture failed to load at path: " + path)
 
     return textureID
+

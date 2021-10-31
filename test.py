@@ -28,7 +28,7 @@ class GraphicsProgram3D:
 
         self.projection_matrix = ProjectionMatrix()
         self.fov = pi / 2
-        self.projection_matrix.set_perspective(self.fov, 800 / 600, 0.5, 100)
+        self.projection_matrix.set_perspective(self.fov, 800 / 600, 0.1, 100)
 
 
         #        positions        colors

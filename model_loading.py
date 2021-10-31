@@ -31,7 +31,7 @@ from model import Model
 
 import platform, ctypes, os
 
-MODEL_RESOURCE_PATH = "../../../resources/objects/"
+MODEL_RESOURCE_PATH = "C:/Users/fanna/OneDrive/Documents/Skóli/Forritun/Tolvugrafik/Assignment05/TGRA-Assignment5/Resources/source"
 
 # settings
 SCR_WIDTH = 800
@@ -86,7 +86,7 @@ def main() -> int:
     ourShader = Shader("1.model_loading.vs", "1.model_loading.fs")
     # load models
     # -----------
-    ourModel = Model(os.path.join(MODEL_RESOURCE_PATH, "backpack/backpack.obj"))
+    ourModel = Model(os.path.join(MODEL_RESOURCE_PATH, "viking_room.obj"))
     # draw in wireframe
     #glPolygonMode(GL_FRONT_AND_BACK, GL_LINE)
 

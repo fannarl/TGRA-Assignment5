@@ -28,10 +28,11 @@ except ImportError:
 from shader_m import Shader
 from camera import Camera, Camera_Movement
 from model import Model
+from bezier import Curve
 
 import platform, ctypes, os
 
-MODEL_RESOURCE_PATH = "../resources/"
+MODEL_RESOURCE_PATH = "/Users/Stones/Documents/tgra/TGRA-Assignment5"
 
 # settings
 SCR_WIDTH = 800
@@ -83,13 +84,31 @@ def main() -> int:
 
     # build and compile shaders
     # -------------------------
-    ourShader = Shader("1.model_loading.vs", "1.model_loading.fs")
+    ourShader = Shader(
+        os.path.join(MODEL_RESOURCE_PATH, "1.model_loading/1.model_loading.vs"),
+        os.path.join(MODEL_RESOURCE_PATH, "1.model_loading/1.model_loading.fs")
+    )
     # load models
     # -----------
-    ourModel = Model(os.path.join(MODEL_RESOURCE_PATH, "viking_room.obj"))
+    ourModel = Model(os.path.join(MODEL_RESOURCE_PATH, "resources/viking_room.obj"))
     # draw in wireframe
     #glPolygonMode(GL_FRONT_AND_BACK, GL_LINE)
 
+    path = [
+        glm.vec3(0, 0, 0), glm.vec3(3, 2, 0),
+        glm.vec3(5, 0, 5), glm.vec3(-1, -2, 0),
+        glm.vec3(0, 0, 5), glm.vec3(0, 0, 4)
+    ]
+
+    curve = Curve()
+
+    curve.addPoint(path[0], path[1])
+    curve.addPoint(path[2], path[3])
+    curve.addPoint(path[4], path[5])
+
+    curve.setBuffer()
+
+    t = 0
     # render loop
     # -----------
     while (not glfwWindowShouldClose(window)):
@@ -99,6 +118,8 @@ def main() -> int:
         currentFrame = glfwGetTime()
         deltaTime = currentFrame - lastFrame
         lastFrame = currentFrame
+
+        camera.Position = curve.getPoint(t)
 
         # input
         # -----
@@ -120,16 +141,23 @@ def main() -> int:
 
         # render the loaded model
         model = glm.mat4(1.0)
-        model = glm.translate(model, glm.vec3(0.0, 0.0, 0.0)) # translate it down so it's at the center of the scene
+        model = glm.translate(model, glm.vec3(10.0, 0.0, 10.0)) # translate it down so it's at the center of the scene
         model = glm.scale(model, glm.vec3(1.0, 1.0, 1.0))	# it's a bit too big for our scene, so scale it down
         ourShader.setMat4("model", model)
         ourModel.Draw(ourShader)
 
-
+        # render curve
+        model = glm.mat4(1.0)
+        model = glm.translate(model, glm.vec3(0.0, 0.0, 0.0))
+        model = glm.scale(model, glm.vec3(1.0, 1.0, 1.0))
+        ourShader.setMat4("model", model)
+        curve.draw(False)
         # glfw: swap buffers and poll IO events (keys pressed/released, mouse moved etc.)
         # -------------------------------------------------------------------------------
         glfwSwapBuffers(window)
         glfwPollEvents()
+
+        t += 0.1 * deltaTime
 
     # glfw: terminate, clearing all previously allocated GLFW resources.
     # ------------------------------------------------------------------

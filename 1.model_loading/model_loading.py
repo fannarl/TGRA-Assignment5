@@ -47,6 +47,9 @@ firstMouse = True
 deltaTime = 0.0
 lastFrame = 0.0
 
+# lighting
+lightPos = glm.vec3(1.2, 1.0, 2.0)
+
 def main() -> int:
     global deltaTime, lastFrame
 
@@ -90,6 +93,20 @@ def main() -> int:
     # draw in wireframe
     #glPolygonMode(GL_FRONT_AND_BACK, GL_LINE)
 
+    # positions of the point lights
+    pointLightPositions = [
+        glm.vec3( 0.7,  0.2,  2.0),
+        glm.vec3( 2.3, -3.3, -4.0),
+        glm.vec3(-4.0,  2.0, -12.0),
+        glm.vec3( 0.0,  0.0, -3.0)
+    ]
+
+    modelVAO = glGenVertexArrays(1)
+    VBO = glGenBuffers(1)
+
+    glBindBuffer(GL_ARRAY_BUFFER, VBO)
+    glBufferData(GL_ARRAY_BUFFER, ourModel.vertices.nbytes, ourModel.vertices.ptr, GL_STATIC_DRAW)
+
     # render loop
     # -----------
     while (not glfwWindowShouldClose(window)):
@@ -111,6 +128,47 @@ def main() -> int:
 
         # don't forget to enable shader before setting uniforms
         ourShader.use()
+        ourShader.setVec3("viewPos", camera.Position)
+        ourShader.setFloat("material.shininess", 32.0)
+
+        # directional light
+        ourShader.setVec3("dirLight.direction", -0.2, -1.0, -0.3)
+        ourShader.setVec3("dirLight.ambient", 0.05, 0.05, 0.05)
+        ourShader.setVec3("dirLight.diffuse", 0.4, 0.4, 0.4)
+        ourShader.setVec3("dirLight.specular", 0.5, 0.5, 0.5)
+        # point light 1
+        ourShader.setVec3("pointLights[0].position", pointLightPositions[0])
+        ourShader.setVec3("pointLights[0].ambient", 0.05, 0.05, 0.05)
+        ourShader.setVec3("pointLights[0].diffuse", 0.8, 0.8, 0.8)
+        ourShader.setVec3("pointLights[0].specular", 1.0, 1.0, 1.0)
+        ourShader.setFloat("pointLights[0].constant", 1.0)
+        ourShader.setFloat("pointLights[0].linear", 0.09)
+        ourShader.setFloat("pointLights[0].quadratic", 0.032)
+        # point light 2
+        ourShader.setVec3("pointLights[1].position", pointLightPositions[1])
+        ourShader.setVec3("pointLights[1].ambient", 0.05, 0.05, 0.05)
+        ourShader.setVec3("pointLights[1].diffuse", 0.8, 0.8, 0.8)
+        ourShader.setVec3("pointLights[1].specular", 1.0, 1.0, 1.0)
+        ourShader.setFloat("pointLights[1].constant", 1.0)
+        ourShader.setFloat("pointLights[1].linear", 0.09)
+        ourShader.setFloat("pointLights[1].quadratic", 0.032)
+        # point light 3
+        ourShader.setVec3("pointLights[2].position", pointLightPositions[2])
+        ourShader.setVec3("pointLights[2].ambient", 0.05, 0.05, 0.05)
+        ourShader.setVec3("pointLights[2].diffuse", 0.8, 0.8, 0.8)
+        ourShader.setVec3("pointLights[2].specular", 1.0, 1.0, 1.0)
+        ourShader.setFloat("pointLights[2].constant", 1.0)
+        ourShader.setFloat("pointLights[2].linear", 0.09)
+        ourShader.setFloat("pointLights[2].quadratic", 0.032)
+        # point light 4
+        ourShader.setVec3("pointLights[3].position", pointLightPositions[3])
+        ourShader.setVec3("pointLights[3].ambient", 0.05, 0.05, 0.05)
+        ourShader.setVec3("pointLights[3].diffuse", 0.8, 0.8, 0.8)
+        ourShader.setVec3("pointLights[3].specular", 1.0, 1.0, 1.0)
+        ourShader.setFloat("pointLights[3].constant", 1.0)
+        ourShader.setFloat("pointLights[3].linear", 0.09)
+        ourShader.setFloat("pointLights[3].quadratic", 0.032)
+
 
         # view/projection transformations
         projection = glm.perspective(glm.radians(camera.Zoom), SCR_WIDTH / SCR_HEIGHT, 0.1, 100.0)

@@ -32,7 +32,7 @@ from bezier import Curve
 
 import platform, ctypes, os
 
-MODEL_RESOURCE_PATH = "/Users/Stones/Documents/tgra/TGRA-Assignment5"
+MODEL_RESOURCE_PATH = "C:/Users/fanna/OneDrive/Documents/Skóli/Forritun/Tolvugrafik/Assignment05/TGRA-Assignment5"
 
 # settings
 SCR_WIDTH = 800
@@ -87,6 +87,7 @@ def main() -> int:
 
     # build and compile shaders
     # -------------------------
+    # ourShader = Shader("1.model_loading.vs", "1.model_loading.fs")
     ourShader = Shader(
         os.path.join(MODEL_RESOURCE_PATH, "1.model_loading/1.model_loading.vs"),
         os.path.join(MODEL_RESOURCE_PATH, "1.model_loading/1.model_loading.fs")

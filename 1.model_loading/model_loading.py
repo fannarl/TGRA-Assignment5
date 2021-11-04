@@ -49,7 +49,7 @@ deltaTime = 0.0
 lastFrame = 0.0
 
 # lighting
-lightPos = glm.vec3(1.2, 1.0, 2.0)
+lightPos = glm.vec3(0.0, 0.1, 0.0)
 
 def main() -> int:
     global deltaTime, lastFrame
@@ -92,6 +92,8 @@ def main() -> int:
         os.path.join(MODEL_RESOURCE_PATH, "1.model_loading/1.model_loading.vs"),
         os.path.join(MODEL_RESOURCE_PATH, "1.model_loading/1.model_loading.fs")
     )
+    lightCubeShader = Shader("6.light_cube.vs", "6.light_cube.fs")
+
     # load models
     # -----------
     ourModel = Model(os.path.join(MODEL_RESOURCE_PATH, "resources/viking_room.obj"))
@@ -110,6 +112,80 @@ def main() -> int:
     curve.setBuffer()
 
     t = 0
+    vertices = glm.array(glm.float32,
+        # positions          # normals           # texture coords
+        -0.5, -0.5, -0.5,  0.0,  0.0, -1.0,  0.0,  0.0,
+         0.5, -0.5, -0.5,  0.0,  0.0, -1.0,  1.0,  0.0,
+         0.5,  0.5, -0.5,  0.0,  0.0, -1.0,  1.0,  1.0,
+         0.5,  0.5, -0.5,  0.0,  0.0, -1.0,  1.0,  1.0,
+        -0.5,  0.5, -0.5,  0.0,  0.0, -1.0,  0.0,  1.0,
+        -0.5, -0.5, -0.5,  0.0,  0.0, -1.0,  0.0,  0.0,
+
+        -0.5, -0.5,  0.5,  0.0,  0.0,  1.0,  0.0,  0.0,
+         0.5, -0.5,  0.5,  0.0,  0.0,  1.0,  1.0,  0.0,
+         0.5,  0.5,  0.5,  0.0,  0.0,  1.0,  1.0,  1.0,
+         0.5,  0.5,  0.5,  0.0,  0.0,  1.0,  1.0,  1.0,
+        -0.5,  0.5,  0.5,  0.0,  0.0,  1.0,  0.0,  1.0,
+        -0.5, -0.5,  0.5,  0.0,  0.0,  1.0,  0.0,  0.0,
+
+        -0.5,  0.5,  0.5, -1.0,  0.0,  0.0,  1.0,  0.0,
+        -0.5,  0.5, -0.5, -1.0,  0.0,  0.0,  1.0,  1.0,
+        -0.5, -0.5, -0.5, -1.0,  0.0,  0.0,  0.0,  1.0,
+        -0.5, -0.5, -0.5, -1.0,  0.0,  0.0,  0.0,  1.0,
+        -0.5, -0.5,  0.5, -1.0,  0.0,  0.0,  0.0,  0.0,
+        -0.5,  0.5,  0.5, -1.0,  0.0,  0.0,  1.0,  0.0,
+
+         0.5,  0.5,  0.5,  1.0,  0.0,  0.0,  1.0,  0.0,
+         0.5,  0.5, -0.5,  1.0,  0.0,  0.0,  1.0,  1.0,
+         0.5, -0.5, -0.5,  1.0,  0.0,  0.0,  0.0,  1.0,
+         0.5, -0.5, -0.5,  1.0,  0.0,  0.0,  0.0,  1.0,
+         0.5, -0.5,  0.5,  1.0,  0.0,  0.0,  0.0,  0.0,
+         0.5,  0.5,  0.5,  1.0,  0.0,  0.0,  1.0,  0.0,
+
+        -0.5, -0.5, -0.5,  0.0, -1.0,  0.0,  0.0,  1.0,
+         0.5, -0.5, -0.5,  0.0, -1.0,  0.0,  1.0,  1.0,
+         0.5, -0.5,  0.5,  0.0, -1.0,  0.0,  1.0,  0.0,
+         0.5, -0.5,  0.5,  0.0, -1.0,  0.0,  1.0,  0.0,
+        -0.5, -0.5,  0.5,  0.0, -1.0,  0.0,  0.0,  0.0,
+        -0.5, -0.5, -0.5,  0.0, -1.0,  0.0,  0.0,  1.0,
+
+        -0.5,  0.5, -0.5,  0.0,  1.0,  0.0,  0.0,  1.0,
+         0.5,  0.5, -0.5,  0.0,  1.0,  0.0,  1.0,  1.0,
+         0.5,  0.5,  0.5,  0.0,  1.0,  0.0,  1.0,  0.0,
+         0.5,  0.5,  0.5,  0.0,  1.0,  0.0,  1.0,  0.0,
+        -0.5,  0.5,  0.5,  0.0,  1.0,  0.0,  0.0,  0.0,
+        -0.5,  0.5, -0.5,  0.0,  1.0,  0.0,  0.0,  1.0
+    )
+
+    pointLightPositions = [
+        glm.vec3( 0.0,  0.2,  0.25),
+        glm.vec3( 1.25, 1.3, -0.45),
+        glm.vec3( -1.1,  1.3, -0.45),
+        glm.vec3( 0.35,  0.6, -0.5),
+        glm.vec3( -0.3,  0.6, -0.5)
+    ]
+
+    cubeVAO = glGenVertexArrays(1)
+    VBO = glGenBuffers(1)
+
+    glBindBuffer(GL_ARRAY_BUFFER, VBO)
+    glBufferData(GL_ARRAY_BUFFER, vertices.nbytes, vertices.ptr, GL_STATIC_DRAW)
+
+    glBindVertexArray(cubeVAO)
+    glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 8 * glm.sizeof(glm.float32), None)
+    glEnableVertexAttribArray(0)
+    glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, 8 * glm.sizeof(glm.float32), ctypes.c_void_p(3 * glm.sizeof(glm.float32)))
+    glEnableVertexAttribArray(1)
+    glVertexAttribPointer(2, 2, GL_FLOAT, GL_FALSE, 8 * glm.sizeof(glm.float32), ctypes.c_void_p(6 * glm.sizeof(glm.float32)))
+    glEnableVertexAttribArray(2)
+
+    lightCubeVAO = glGenVertexArrays(1)
+    glBindVertexArray(lightCubeVAO)
+
+    glBindBuffer(GL_ARRAY_BUFFER, VBO)
+    # note that we update the lamp's position attribute's stride to reflect the updated buffer data
+    glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 8 * glm.sizeof(glm.float32), None)
+    glEnableVertexAttribArray(0)
     # render loop
     # -----------
     while (not glfwWindowShouldClose(window)):
@@ -139,16 +215,51 @@ def main() -> int:
 
         # don't forget to enable shader before setting uniforms
         ourShader.use()
-        ourShader.setVec3("light.position", lightPos)
+        # ourShader.setVec3("light.position", lightPos)
         ourShader.setVec3("viewPos", camera.Position)
 
         # light properties
-        ourShader.setVec3("light.ambient", 0.2, 0.2, 0.2)
-        ourShader.setVec3("light.diffuse", 0.5, 0.5, 0.5)
-        ourShader.setVec3("light.specular", 1.0, 1.0, 1.0)
-        ourShader.setFloat("light.constant", 1.0)
-        ourShader.setFloat("light.linear", 0.09)
-        ourShader.setFloat("light.quadratic", 0.032)
+        # point light 1
+        ourShader.setVec3("lights[0].position", pointLightPositions[0])
+        ourShader.setVec3("lights[0].ambient", 0.08, 0.03, 0.01)
+        ourShader.setVec3("lights[0].diffuse", 0.2, 0.2, 0.2)
+        ourShader.setVec3("lights[0].specular", 0.886, 0.345, 0.133)
+        ourShader.setFloat("lights[0].constant", 1.0)
+        ourShader.setFloat("lights[0].linear", 0.09)
+        ourShader.setFloat("lights[0].quadratic", 0.032)
+        # point light 2
+        ourShader.setVec3("lights[1].position", pointLightPositions[1])
+        ourShader.setVec3("lights[1].ambient", 0.08, 0.03, 0.01)
+        ourShader.setVec3("lights[1].diffuse", 0.2, 0.2, 0.2)
+        ourShader.setVec3("lights[1].specular", 0.886, 0.345, 0.133)
+        ourShader.setFloat("lights[1].constant", 1.0)
+        ourShader.setFloat("lights[1].linear", 0.09)
+        ourShader.setFloat("lights[1].quadratic", 0.032)
+        # point light 3
+        ourShader.setVec3("lights[2].position", pointLightPositions[2])
+        ourShader.setVec3("lights[2].ambient", 0.08, 0.03, 0.01)
+        ourShader.setVec3("lights[2].diffuse", 0.2, 0.2, 0.2)
+        ourShader.setVec3("lights[2].specular", 0.886, 0.345, 0.133)
+        ourShader.setFloat("lights[2].constant", 1.0)
+        ourShader.setFloat("lights[2].linear", 0.09)
+        ourShader.setFloat("lights[2].quadratic", 0.032)
+        # point light 4
+        ourShader.setVec3("lights[3].position", pointLightPositions[3])
+        ourShader.setVec3("lights[3].ambient", 0.08, 0.03, 0.01)
+        ourShader.setVec3("lights[3].diffuse", 0.2, 0.2, 0.2)
+        ourShader.setVec3("lights[3].specular", 0.886, 0.345, 0.133)
+        ourShader.setFloat("lights[3].constant", 1.0)
+        ourShader.setFloat("lights[3].linear", 0.09)
+        ourShader.setFloat("lights[3].quadratic", 0.032)
+        # point light 5
+        ourShader.setVec3("lights[3].position", pointLightPositions[4])
+        ourShader.setVec3("lights[3].ambient", 0.08, 0.03, 0.01)
+        ourShader.setVec3("lights[3].diffuse", 0.2, 0.2, 0.2)
+        ourShader.setVec3("lights[3].specular", 0.886, 0.345, 0.133)
+        ourShader.setFloat("lights[3].constant", 1.0)
+        ourShader.setFloat("lights[3].linear", 0.09)
+        ourShader.setFloat("lights[3].quadratic", 0.032)
+
 
         # view/projection transformations
         projection = glm.perspective(glm.radians(camera.Zoom), SCR_WIDTH / SCR_HEIGHT, 0.1, 100.0)
@@ -163,8 +274,22 @@ def main() -> int:
         ourShader.setMat4("model", model)
         ourModel.Draw(ourShader)
 
+        lightCubeShader.use()
+        lightCubeShader.setMat4("projection", projection)
+        lightCubeShader.setMat4("view", view)
+
+        glBindVertexArray(lightCubeVAO)
+        # for i in range(5):
+
+        #--------------remove comments for debugging-------------------#
+        #  model = glm.mat4(1.0)
+        #  model = glm.translate(model, pointLightPositions[i])
+        #  model = glm.scale(model, glm.vec3(0.2)) # Make it a smaller cube
+        #  lightCubeShader.setMat4("model", model)
+        #  glDrawArrays(GL_TRIANGLES, 0, 36)
+        #--------------------------------------------------------------#
+
         # render curve
-        
         ourShader.setMat4("model", curvemodel)
         curve.draw()
         # glfw: swap buffers and poll IO events (keys pressed/released, mouse moved etc.)

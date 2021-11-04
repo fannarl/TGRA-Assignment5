@@ -89,10 +89,10 @@ def main() -> int:
     # -------------------------
     # ourShader = Shader("1.model_loading.vs", "1.model_loading.fs")
     ourShader = Shader(
-        os.path.join(MODEL_RESOURCE_PATH, "1.model_loading/1.model_loading.vs"),
-        os.path.join(MODEL_RESOURCE_PATH, "1.model_loading/1.model_loading.fs")
+        os.path.join(MODEL_RESOURCE_PATH, "model_loading.vs"),
+        os.path.join(MODEL_RESOURCE_PATH, "model_loading.fs")
     )
-    lightCubeShader = Shader("6.light_cube.vs", "6.light_cube.fs")
+    lightCubeShader = Shader("light_cube.vs", "light_cube.fs")
 
     # load models
     # -----------

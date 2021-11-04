@@ -14,7 +14,7 @@ import platform, ctypes, os
 from typing import List
 
 # function that loads and automatically flips an image vertically
-LOAD_IMAGE = lambda name: Image.open(name) #.transpose(Image.FLIP_TOP_BOTTOM)
+LOAD_IMAGE = lambda name: Image.open(name)#.transpose(Image.FLIP_TOP_BOTTOM)
 
 class Model:
 

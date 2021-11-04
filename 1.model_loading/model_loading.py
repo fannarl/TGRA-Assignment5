@@ -99,16 +99,13 @@ def main() -> int:
     #glPolygonMode(GL_FRONT_AND_BACK, GL_LINE)
 
     path = [
-        glm.vec3(0, 0, 0), glm.vec3(3, 2, 0),
-        glm.vec3(5, 0, 5), glm.vec3(-1, -2, 0),
-        glm.vec3(0, 0, 5), glm.vec3(0, 0, 4)
+        (glm.vec3(0, 0, 0), glm.vec3(3, 2, 0)),
+        (glm.vec3(5, 0, 5), glm.vec3(-1, -1, 0)),
+        (glm.vec3(3, 0, 3), glm.vec3(0, 0, -4)),
+        (glm.vec3(5, 0.5, 3), glm.vec3(0, 0, 4))
     ]
 
-    curve = Curve()
-
-    curve.addPoint(path[0], path[1])
-    curve.addPoint(path[2], path[3])
-    curve.addPoint(path[4], path[5])
+    curve = Curve(path)
 
     curve.setBuffer()
 
@@ -123,7 +120,13 @@ def main() -> int:
         deltaTime = currentFrame - lastFrame
         lastFrame = currentFrame
 
+        curvemodel = glm.mat4(1.0)
+        curvemodel = glm.translate(curvemodel, glm.vec3(5.0, 1.0, 5.0))
+        curvemodel = glm.scale(curvemodel, glm.vec3(1.0, 1.0, 1.0))
+        curvemodel = glm.rotate(curvemodel, glm.radians(180), glm.vec3(0.0, 1.0, 0.0))
+
         camera.Position = curve.getPoint(t)
+        camera.Position = glm.vec3(curvemodel * glm.vec4(camera.Position, 1.0))
 
         # input
         # -----
@@ -155,17 +158,15 @@ def main() -> int:
 
         # render the loaded model
         model = glm.mat4(1.0)
-        model = glm.translate(model, glm.vec3(10.0, 0.0, 10.0)) # translate it down so it's at the center of the scene
+        model = glm.translate(model, glm.vec3(0.0, 0.0, 0.0)) # translate it down so it's at the center of the scene
         model = glm.scale(model, glm.vec3(1.0, 1.0, 1.0))	# it's a bit too big for our scene, so scale it down
         ourShader.setMat4("model", model)
         ourModel.Draw(ourShader)
 
         # render curve
-        model = glm.mat4(1.0)
-        model = glm.translate(model, glm.vec3(0.0, 0.0, 0.0))
-        model = glm.scale(model, glm.vec3(1.0, 1.0, 1.0))
-        ourShader.setMat4("model", model)
-        curve.draw(False)
+        
+        ourShader.setMat4("model", curvemodel)
+        curve.draw()
         # glfw: swap buffers and poll IO events (keys pressed/released, mouse moved etc.)
         # -------------------------------------------------------------------------------
         glfwSwapBuffers(window)
